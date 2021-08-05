@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/json-java.jar"
+    ],
+    "java.project.sourcePaths": [
+        "src"
+    ],
+}

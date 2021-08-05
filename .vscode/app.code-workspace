@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"java.project.referencedLibraries": [
+			"lib/json-simple-1.1.1.jar"
+		],
+		"java.project.sourcePaths": [
+			"src"
+		]
+	}
+}
