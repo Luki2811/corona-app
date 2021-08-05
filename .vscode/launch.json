@@ -9,6 +9,13 @@
             "name": "Launch App",
             "request": "launch",
             "mainClass": "App",
+            "projectName": "corona-app_9b189bb"
+        },
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
+            "mainClass": "App",
             "projectName": "Corona-app_a9936ba2"
         },
         {
