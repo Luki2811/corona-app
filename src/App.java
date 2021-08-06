@@ -21,20 +21,21 @@ public class App {
             System.exit(-1);
         }
 
-        String inzidenz;
+        String[] coronaData = new String[2];
         try {
             if(location.toLowerCase().startsWith("sk") || location.toLowerCase().startsWith("lk"))
-            inzidenz = getInzidenzLand(location);
+            coronaData = getInzidenzLand(location);
             else
-            inzidenz = getInzidenzBund(location);
+            coronaData = getInzidenzBund(location);
         } catch (NullPointerException e) {
-            System.err.println("");
-            inzidenz = null;
+            coronaData = null;
             System.exit(-1);
         }
-        System.out.printf("%s hat eine Coronainzidenz von: %s", location, inzidenz);
+        
+        
+        System.out.printf("%s hat eine Coronainzidenz von: %s", coronaData[0], coronaData[1]);
         System.out.println(" ");
-        openWindow(location, inzidenz);
+        openWindow(coronaData[1], coronaData[0]);
     }
         
     private static void openWindow(String county, String covidInzidenz){
@@ -71,8 +72,8 @@ public class App {
         }       
     }
 
-    public static String getInzidenzLand(String location){
-        String covidInzidenz;
+    public static String[] getInzidenzLand(String location){
+        String[] covidInzidenz = new String[2];
         URL url;
         try {
             url = new URL("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=county%20%3D%20'" + location.toLowerCase().replaceAll(" ", "%20").replaceAll("\u00e4", "%C3%A4").replaceAll("\u00f6", "%C3%B6").replaceAll("\u00fc", "%C3%BC") + "'&outFields=cases7_per_100k,county&returnGeometry=false&returnDistinctValues=true&outSR=4326&f=json");
@@ -91,7 +92,8 @@ public class App {
         }
         JSONObject jsonObj = new JSONObject(json);
 
-        covidInzidenz = jsonObj.get("cases7_per_100k").toString();
+        covidInzidenz[0] = jsonObj.get("cases7_per_100k").toString();
+        covidInzidenz[1] = jsonObj.getString("county");
         return covidInzidenz;
         
     }
@@ -116,8 +118,8 @@ public class App {
         return jsonObject;
     }
 
-    public static String getInzidenzBund(String location){
-        String covidInzidenz;
+    public static String[] getInzidenzBund(String location){
+        String[] covidInzidenz;
         URL url;
         try {
             url = new URL("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=LAN_ew_GEN%20%3D%20'" + location.toLowerCase().replaceAll(" ", "%20").replaceAll("\u00e4", "%C3%A4").replaceAll("\u00f6", "%C3%B6").replaceAll("\u00fc", "%C3%BC") + "'&outFields=LAN_ew_GEN,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json");
@@ -135,7 +137,9 @@ public class App {
             System.exit(-1);
         }
         JSONObject jsonObj = new JSONObject(json);
-        covidInzidenz = jsonObj.get("cases7_bl_per_100k").toString();
+        covidInzidenz = new String[2];
+        covidInzidenz[0] = jsonObj.get("cases7_bl_per_100k").toString();
+        covidInzidenz[1] = jsonObj.getString("LAN_ew_GEN");
         return covidInzidenz;
         
     }
