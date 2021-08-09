@@ -1,4 +1,5 @@
 package de.luki2811.dev.coronaapp;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -152,9 +153,6 @@ public class App{
         covidInzidenz = new String[2];
         covidInzidenz[0] = jsonObj.get("cases7_bl_per_100k").toString();
         covidInzidenz[1] = jsonObj.getString("LAN_ew_GEN");
-        return covidInzidenz;
-        
-    }
-    
-    
+        return covidInzidenz;  
+    }    
 }
