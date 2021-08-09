@@ -8,6 +8,20 @@
             "type": "java",
             "name": "Launch App",
             "request": "launch",
+            "mainClass": "de.luki2811.dev.coronaapp.App",
+            "projectName": "corona-app_db8a288d"
+        },
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "corona-app_db8a288d"
+        },
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
             "mainClass": "App",
             "projectName": "corona-app_9b189bb"
         },
