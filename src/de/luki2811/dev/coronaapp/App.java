@@ -1,3 +1,5 @@
+package de.luki2811.dev.coronaapp;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -11,11 +13,22 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.awt.Dimension;
 
-public class App {
+public class App{
     public static void main(String[] args) throws Exception { 
+        String[] boxItems = {"Landkreis", "Stadtkreis", "Bundesland"};
+        JComboBox comboBox = new JComboBox(boxItems);
+		JTextField text = new JTextField();
         
-        String location = JOptionPane.showInputDialog("Landkreis (LK)/Stadtkreis (SK)/Bundesland");
-        
+        Object[] message = {comboBox, text};
+
+        JOptionPane pane = new JOptionPane( message, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+        pane.createDialog(null, "Eingabe").setVisible(true);
+
+        String location = null;
+        if(!isNullOrEmpty(text.getText())){
+            location = (comboBox.getItemAt(comboBox.getSelectedIndex())) + " " + text.getText();
+        }
+
         if (!avaibleConnection()) {
             JOptionPane.showMessageDialog(null, "Es konnte keine Internetverbindung hergestellt werden", "ERROR", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
@@ -23,7 +36,7 @@ public class App {
 
         String[] coronaData = new String[2];
         try {
-            if(location.toLowerCase().startsWith("sk") || location.toLowerCase().startsWith("lk"))
+            if(location.startsWith("Stadtkreis") || location.startsWith("Landkreis"))
             coronaData = getInzidenzLand(location);
             else
             coronaData = getInzidenzBund(location);
@@ -76,7 +89,7 @@ public class App {
         String[] covidInzidenz = new String[2];
         URL url;
         try {
-            url = new URL("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=county%20%3D%20'" + location.toLowerCase().replaceAll(" ", "%20").replaceAll("\u00e4", "%C3%A4").replaceAll("\u00f6", "%C3%B6").replaceAll("\u00fc", "%C3%BC") + "'&outFields=cases7_per_100k,county&returnGeometry=false&returnDistinctValues=true&outSR=4326&f=json");
+            url = new URL("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=county%20%3D%20'" + location.toLowerCase().replaceAll(" ", "%20").replaceAll("landkreis", "lk").replaceAll("stadtkreis", "sk").replaceAll("\u00e4", "%C3%A4").replaceAll("\u00f6", "%C3%B6").replaceAll("\u00fc", "%C3%BC") + "'&outFields=cases7_per_100k,county&returnGeometry=false&returnDistinctValues=true&outSR=4326&f=json");
         } catch (MalformedURLException e) {
             e.printStackTrace();
             url = null;
@@ -122,7 +135,7 @@ public class App {
         String[] covidInzidenz;
         URL url;
         try {
-            url = new URL("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=LAN_ew_GEN%20%3D%20'" + location.toLowerCase().replaceAll(" ", "%20").replaceAll("\u00e4", "%C3%A4").replaceAll("\u00f6", "%C3%B6").replaceAll("\u00fc", "%C3%BC") + "'&outFields=LAN_ew_GEN,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json");
+            url = new URL("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=LAN_ew_GEN%20%3D%20'" + location.toLowerCase().replaceAll("bundesland ", "").replaceAll(" ", "%20").replaceAll("\u00e4", "%C3%A4").replaceAll("\u00f6", "%C3%B6").replaceAll("\u00fc", "%C3%BC") + "'&outFields=LAN_ew_GEN,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json");
         } catch (MalformedURLException e) {
             e.printStackTrace();
             url = null;
@@ -140,7 +153,6 @@ public class App {
         covidInzidenz = new String[2];
         covidInzidenz[0] = jsonObj.get("cases7_bl_per_100k").toString();
         covidInzidenz[1] = jsonObj.getString("LAN_ew_GEN");
-        return covidInzidenz;
-        
-    }
+        return covidInzidenz;  
+    }    
 }
