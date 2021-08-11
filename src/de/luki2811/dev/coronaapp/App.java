@@ -34,6 +34,8 @@ public class App{
             System.exit(-1);
         }
 
+        System.out.print("Kurzer Test");
+
         String[] coronaData = new String[2];
         try {
             if(location.startsWith("Stadtkreis") || location.startsWith("Landkreis"))
