@@ -34,8 +34,6 @@ public class App{
             System.exit(-1);
         }
 
-        System.out.print("Kurzer Test");
-
         String[] coronaData = new String[2];
         try {
             if(location.startsWith("Stadtkreis") || location.startsWith("Landkreis"))
@@ -57,11 +55,11 @@ public class App{
         String output = (county + " hat eine Inzidenz (Fälle letzte 7 Tage/100.000 EW) von " + covidInzidenz);
         JFrame window = new JFrame();
         window.setTitle("Covid-19 Inzidenz " + county);
-        window.setSize(700 , 100);
+        window.setSize(600 , 100);
         window.setLocationRelativeTo(null);
         Container content = new JPanel();
         JLabel data = new JLabel(output);
-        JLabel quelle = new JLabel("Quelle: Robert Koch-Institut (RKI), dl-de/by-2-0 ");
+        JLabel quelle = new JLabel("Quelle: Robert Koch-Institut (RKI), dl-de/by-2-0");
         LocalDate date = LocalDate.now();
         JLabel dateLabel = new JLabel(String.format("Stand: "+ date));
         content.add(data);
@@ -107,7 +105,7 @@ public class App{
         }
         JSONObject jsonObj = new JSONObject(json);
 
-        covidInzidenz[0] = jsonObj.get("cases7_per_100k").toString();
+        covidInzidenz[0] = Double.toString(round(Double.parseDouble(jsonObj.get("cases7_per_100k").toString()),2));
         covidInzidenz[1] = jsonObj.getString("county");
         return covidInzidenz;
         
@@ -153,8 +151,20 @@ public class App{
         }
         JSONObject jsonObj = new JSONObject(json);
         covidInzidenz = new String[2];
-        covidInzidenz[0] = jsonObj.get("cases7_bl_per_100k").toString();
+        
+        covidInzidenz[0] = Double.toString(round(Double.parseDouble(jsonObj.get("cases7_bl_per_100k").toString()),2));
         covidInzidenz[1] = jsonObj.getString("LAN_ew_GEN");
         return covidInzidenz;  
-    }    
+    }
+
+    /**
+    * Rundet den übergebenen Wert auf die Anzahl der übergebenen Nachkommastellen
+    *
+    * @param value ist der zu rundende Wert.
+    * @param decimalPoints ist die Anzahl der Nachkommastellen, auf die gerundet werden soll.
+    */
+    private static double round(double value, int decimalPoints) {
+        double d = Math.pow(10, decimalPoints);
+        return Math.round(value * d) / d;
+    }
 }
