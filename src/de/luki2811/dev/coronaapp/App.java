@@ -56,7 +56,7 @@ public class App{
             inputAsJson.put("indexOfComboBox",comboBox.getSelectedIndex());
             inputAsJson.put("text", text.getText());
 
-            writeInTxt(inputAsJson.toString(), fileName);
+            writeInFile(inputAsJson.toString(), fileName);
         }
 
         if (!avaibleConnection()) {
@@ -198,7 +198,7 @@ public class App{
         return Math.round(value * d) / d;
     }
 
-    public static void writeInTxt(String text, String nameOfFile){
+    public static void writeInFile(String text, String nameOfFile){
         FileWriter writer;
         File datei = new File(nameOfFile);
         
