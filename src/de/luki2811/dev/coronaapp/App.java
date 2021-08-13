@@ -26,7 +26,7 @@ public class App{
         final String fileName = "temp.json";      
 
         String[] boxItems = {"Landkreis", "Stadtkreis", "Bundesland"};
-        JComboBox comboBox = new JComboBox(boxItems);
+        JComboBox<String> comboBox = new JComboBox<>(boxItems);
 		JTextField text = new JTextField();
 
         JSONObject lastInput = null;
@@ -76,7 +76,7 @@ public class App{
         }
         
         
-        System.out.printf("%s hat eine Coronainzidenz von: %s", coronaData[0], coronaData[1]);
+        System.out.printf("%s hat eine Coronainzidenz von: %s", coronaData[1], coronaData[0]);
         System.out.println(" ");
         openWindow(coronaData[1], coronaData[0]);
     }
