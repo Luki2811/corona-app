@@ -1,10 +1,17 @@
 package de.luki2811.dev.coronaapp;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.json.*;
 import java.awt.Container;
 import java.time.LocalDate;
@@ -15,9 +22,13 @@ import java.awt.Dimension;
 
 public class App{
     public static void main(String[] args) throws Exception { 
+
+        Path path = FileSystems.getDefault().getPath("temp.txt");
+
         String[] boxItems = {"Landkreis", "Stadtkreis", "Bundesland"};
         JComboBox comboBox = new JComboBox(boxItems);
 		JTextField text = new JTextField();
+        text.setText(loadFromFile(path));
         
         Object[] message = {comboBox, text};
 
@@ -27,6 +38,7 @@ public class App{
         String location = null;
         if(!isNullOrEmpty(text.getText())){
             location = (comboBox.getItemAt(comboBox.getSelectedIndex())) + " " + text.getText();
+            writeInTxt(text.getText(), "temp.txt");
         }
 
         if (!avaibleConnection()) {
@@ -166,5 +178,30 @@ public class App{
     private static double round(double value, int decimalPoints) {
         double d = Math.pow(10, decimalPoints);
         return Math.round(value * d) / d;
+    }
+
+    public static void writeInTxt(String text, String nameOfFile){
+        FileWriter writer;
+        File datei = new File(nameOfFile);
+        
+        try {
+            writer = new FileWriter(datei);
+            writer.write(text);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String loadFromFile(Path path){
+        String in = null;
+        try {
+            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+            in = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return in;
     }
 }
