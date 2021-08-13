@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.json.*;
 import java.awt.Container;
 import java.time.LocalDate;
@@ -21,24 +20,43 @@ import java.net.MalformedURLException;
 import java.awt.Dimension;
 
 public class App{
+
     public static void main(String[] args) throws Exception { 
 
-        Path path = FileSystems.getDefault().getPath("temp.txt");
+        final String fileName = "temp.json";      
 
         String[] boxItems = {"Landkreis", "Stadtkreis", "Bundesland"};
         JComboBox comboBox = new JComboBox(boxItems);
 		JTextField text = new JTextField();
-        text.setText(loadFromFile(path));
+
+        JSONObject lastInput = null;
+        Path path = FileSystems.getDefault().getPath(fileName);
+        if(path.toFile().isFile()){
+            try {
+                lastInput = new JSONObject(loadFromFile(path));
+                text.setText(lastInput.getString("text"));
+                comboBox.setSelectedIndex(lastInput.getInt("indexOfComboBox"));
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
         
         Object[] message = {comboBox, text};
 
-        JOptionPane pane = new JOptionPane( message, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-        pane.createDialog(null, "Eingabe").setVisible(true);
+        
+        JOptionPane pane = new JOptionPane( message, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
+        pane.createDialog(null, "Eingabe").setVisible(true); 
+        
 
         String location = null;
         if(!isNullOrEmpty(text.getText())){
             location = (comboBox.getItemAt(comboBox.getSelectedIndex())) + " " + text.getText();
-            writeInTxt(text.getText(), "temp.txt");
+
+            JSONObject inputAsJson = new JSONObject();
+            inputAsJson.put("indexOfComboBox",comboBox.getSelectedIndex());
+            inputAsJson.put("text", text.getText());
+
+            writeInTxt(inputAsJson.toString(), fileName);
         }
 
         if (!avaibleConnection()) {
