@@ -63,7 +63,6 @@ public class Window extends JFrame implements ActionListener {
         textLabel = new JLabel("");
         panel_center = new JPanel();
         panel_center.add(textLabel);
-
         JSONObject lastInput = null;
         Path path = FileSystems.getDefault().getPath(App.fileName);
         if(path.toFile().isFile()){

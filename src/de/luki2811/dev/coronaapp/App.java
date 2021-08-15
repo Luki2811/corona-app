@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.json.*;
@@ -23,6 +24,35 @@ public class App{
 
     public static void main(String[] args) throws Exception { 
         Window fenster = new Window("Corona App");
+        Path path = FileSystems.getDefault().getPath(fileName);
+        String location = null;
+        String tempStr = null;
+        int index = 0;
+        JSONObject lastInput = null;
+        if(path.toFile().isFile()){
+            try {
+                lastInput = new JSONObject(App.loadFromFile(path));
+                location = lastInput.getString("text");
+                index = lastInput.getInt("indexOfComboBox");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.err.println("Fehler beim Lesen der JSON-Datei!\nLöschen der 'temp.json' wird empfohlen.");;
+            }
+        }
+        if(index == 0) {
+            tempStr = "Landkreis";
+        } else if(index == 1){
+            tempStr = "Stadtkreis";
+        } else if(index == 2){
+            tempStr = "Bundesland";
+        } else{
+        JOptionPane.showMessageDialog(null, "Fehler bei der Auswertung der JSON","Fehler",JOptionPane.WARNING_MESSAGE);
+        }
+        location = tempStr + " " + location;
+        String[] temp = getCoronaData(location);
+    
+        fenster.textLabel.setText(temp[1] + " hat eine Inzidenz (Fälle letzte 7 Tage/100.000 EW) von " + temp[0]);
+        
     }
 
     public static String[] getCoronaData(String location){
@@ -77,7 +107,7 @@ public class App{
             System.err.println(json);
         }
         JSONObject jsonObj = new JSONObject(json);
-
+        
         covidInzidenz[0] = Double.toString(round(Double.parseDouble(jsonObj.get("cases7_per_100k").toString()),2));
         covidInzidenz[1] = jsonObj.getString("county");
         return covidInzidenz;
