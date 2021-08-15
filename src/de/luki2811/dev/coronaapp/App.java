@@ -8,99 +8,43 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.json.*;
-import java.awt.Container;
-import java.time.LocalDate;
 import javax.swing.*;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.awt.Dimension;
 
 public class App{
 
+    final static String fileName = "temp.json";
+    final static String version = "v.0.3.0-alpha";
+    final static String quelle = "Quelle: Robert Koch-Institut (RKI), dl-de/by-2-0";
+
     public static void main(String[] args) throws Exception { 
+        Window fenster = new Window("Corona App");
+    }
 
-        final String fileName = "temp.json";      
-
-        String[] boxItems = {"Landkreis", "Stadtkreis", "Bundesland"};
-        JComboBox<String> comboBox = new JComboBox<>(boxItems);
-		JTextField text = new JTextField();
-
-        JSONObject lastInput = null;
-        Path path = FileSystems.getDefault().getPath(fileName);
-        if(path.toFile().isFile()){
-            try {
-                lastInput = new JSONObject(loadFromFile(path));
-                text.setText(lastInput.getString("text"));
-                comboBox.setSelectedIndex(lastInput.getInt("indexOfComboBox"));
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
+    public static String[] getCoronaData(String location){
         
-        Object[] message = {comboBox, text};
-
-        
-        JOptionPane pane = new JOptionPane( message, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
-        pane.createDialog(null, "Eingabe").setVisible(true); 
-        
-
-        String location = null;
-        if(!isNullOrEmpty(text.getText())){
-            location = (comboBox.getItemAt(comboBox.getSelectedIndex())) + " " + text.getText();
-
-            JSONObject inputAsJson = new JSONObject();
-            inputAsJson.put("indexOfComboBox",comboBox.getSelectedIndex());
-            inputAsJson.put("text", text.getText());
-
-            writeInFile(inputAsJson.toString(), fileName);
-        }
-
-        if (!avaibleConnection()) {
+        if (!App.avaibleConnection()) {
             JOptionPane.showMessageDialog(null, "Es konnte keine Internetverbindung hergestellt werden", "ERROR", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         }
-
         String[] coronaData = new String[2];
         try {
             if(location.startsWith("Stadtkreis") || location.startsWith("Landkreis"))
-            coronaData = getInzidenzLand(location);
+            coronaData = App.getInzidenzLand(location);
             else
-            coronaData = getInzidenzBund(location);
-        } catch (NullPointerException e) {
+            coronaData = App.getInzidenzBund(location);
+        } catch (NullPointerException ed) {
             coronaData = null;
+            ed.printStackTrace();
             System.exit(-1);
         }
-        
-        
-        System.out.printf("%s hat eine Coronainzidenz von: %s", coronaData[1], coronaData[0]);
-        System.out.println(" ");
-        openWindow(coronaData[1], coronaData[0]);
+        return coronaData;
     }
         
-    private static void openWindow(String county, String covidInzidenz){
-        String output = (county + " hat eine Inzidenz (Fälle letzte 7 Tage/100.000 EW) von " + covidInzidenz);
-        JFrame window = new JFrame();
-        window.setTitle("Covid-19 Inzidenz " + county);
-        window.setSize(600 , 100);
-        window.setLocationRelativeTo(null);
-        Container content = new JPanel();
-        JLabel data = new JLabel(output);
-        JLabel quelle = new JLabel("Quelle: Robert Koch-Institut (RKI), dl-de/by-2-0");
-        LocalDate date = LocalDate.now();
-        JLabel dateLabel = new JLabel(String.format("Stand: "+ date));
-        content.add(data);
-        content.add(quelle);
-        content.add(dateLabel);
-        window.setContentPane(content);
-        window.setMinimumSize(new Dimension(600, 100));
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setVisible(true);
-    }
-
     public static boolean isNullOrEmpty(String str){
         return str == null || str.isEmpty();
     }
@@ -131,7 +75,6 @@ public class App{
         if (json.equals("[]")){
             JOptionPane.showMessageDialog(null, "Fehler bei der Auswertung: '" + location.replaceAll("%20", " ") + "' konnte nicht gefunden werden", "ERROR", JOptionPane.ERROR_MESSAGE);
             System.err.println(json);
-            System.exit(-1);
         }
         JSONObject jsonObj = new JSONObject(json);
 
@@ -171,13 +114,18 @@ public class App{
             url = null;
         }
         JSONObject jsonObject = getJSONfromURL(url);
+        String json = null;
+
+        try {
+            json = jsonObject.get("features").toString().replaceAll("\\[\\{\"attributes\":","").replaceAll("}]","");
+        } catch (JSONException e) {
+            ;
+        }
         
-        String json = jsonObject.get("features").toString().replaceAll("\\[\\{\"attributes\":","").replaceAll("}]","");
         
         if (json.equals("[]")){
             JOptionPane.showMessageDialog(null, "Fehler bei der Auswertung: '" + location.replaceAll("%20", " ") + "' konnte nicht gefunden werden", "ERROR", JOptionPane.ERROR_MESSAGE);
             System.err.println(json);
-            System.exit(-1);
         }
         JSONObject jsonObj = new JSONObject(json);
         covidInzidenz = new String[2];
@@ -215,7 +163,7 @@ public class App{
     public static String loadFromFile(Path path){
         String in = null;
         try {
-            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.ISO_8859_1);
             in = reader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
