@@ -1,10 +1,10 @@
 package de.luki2811.dev.coronaapp;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.Scanner;
 import java.nio.charset.StandardCharsets;
@@ -119,7 +119,6 @@ public class App{
         try(InputStream is = url.openStream();
             Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 jsonObject = new JSONObject(scanner.useDelimiter("//Z").next().toString());
-            
             }
         catch(IOException e){
             e.printStackTrace();
@@ -177,14 +176,9 @@ public class App{
     }
 
     public static void writeInFile(String text, String nameOfFile){
-        FileWriter writer;
-        File datei = new File(nameOfFile);
-        
-        try {
-            writer = new FileWriter(datei);
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(nameOfFile), StandardCharsets.UTF_8)){
             writer.write(text);
             writer.flush();
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,7 +187,7 @@ public class App{
     public static String loadFromFile(Path path){
         String in = null;
         try {
-            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.ISO_8859_1);
+            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
             in = reader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
