@@ -19,7 +19,7 @@ import java.net.MalformedURLException;
 public class App{
 
     final static String fileName = "temp.json";
-    final static String version = "v.0.3.0-alpha";
+    final static String version = "v.0.4.0-alpha";
     final static String quelle = "Quelle: Robert Koch-Institut (RKI), dl-de/by-2-0";
 
     public static void main(String[] args) throws Exception { 
@@ -48,11 +48,14 @@ public class App{
         } else{
         JOptionPane.showMessageDialog(null, "Fehler bei der Auswertung der JSON","Fehler",JOptionPane.WARNING_MESSAGE);
         }
-        location = tempStr + " " + location;
-        String[] temp = getCoronaData(location);
-    
-        fenster.textLabel.setText(temp[1] + " hat eine Inzidenz (Fälle letzte 7 Tage/100.000 EW) von " + temp[0]);
-        
+        String[] temp = new String[2];
+        if(location == null){
+            fenster.textLabel.setText("");
+        }else{
+            location = tempStr + " " + location;
+            temp = getCoronaData(location);
+            fenster.textLabel.setText(temp[1] + " hat eine Inzidenz (Fälle letzte 7 Tage/100.000 EW) von " + temp[0]);
+        }
     }
 
     public static String[] getCoronaData(String location){
@@ -148,7 +151,7 @@ public class App{
         try {
             json = jsonObject.get("features").toString().replaceAll("\\[\\{\"attributes\":","").replaceAll("}]","");
         } catch (JSONException e) {
-            ;
+            e.printStackTrace();
         }
         
         
